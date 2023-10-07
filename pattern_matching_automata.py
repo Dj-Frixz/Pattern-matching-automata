@@ -156,6 +156,6 @@ if __name__ == '__main__':
     print('Pattern c = a + b:',c.PATTERN)
     c.process(text)
     j = k + a
-    print('Table j (subset of table k):')
+    print('Table j (superset of table k):')
     print(j)
     j.process(text, verbose = True)
