@@ -19,18 +19,19 @@ class pattern_matching_fsa:
     
     def __str__(self) -> str:
         '''A method to represent the FSA in the table format.'''
-        table = '\n    '
+        space_btw = ' '*self.__digits
+        table = '\n   ' + space_btw
         SIGMA = self.alphabet
         for ch in SIGMA:
-            table += ' '*self.__digits + ch
-        table += '\n     ' + ('-'*(self.__digits + 1)) * (len(SIGMA)-1) + '-'*self.__digits
+            table += space_btw + ch
+        table += '\n    ' + space_btw + ('-'*(self.__digits + 1)) * (len(SIGMA)-1) + '-'*self.__digits
         for state in self.dict:
             table += '\n {:{space}d} :'.format(state, space=self.__digits)
             for ch in SIGMA:
                 if ch in self.dict[state]:
                     table += ' {:{space}d}'.format(self.dict[state][ch], space=self.__digits)
                 else:
-                    table += ' 0' # self.dict[state][-1] should be 0 for any state
+                    table += space_btw + '0' # self.dict[state][-1] should be 0 for any state
         table += '\n'
         return table
     
