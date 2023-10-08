@@ -135,6 +135,9 @@ class pattern_matching_fsa:
 
 if __name__ == '__main__':
 
+    print('This, below, is a demonstration to show the functionalities of this class.')
+    print('To use this class simply import it from another file.\n')
+
     # Basic usage
     k = pattern_matching_fsa('TAT')
     print('Pattern:',k.PATTERN)
@@ -154,6 +157,7 @@ if __name__ == '__main__':
     print('a == b ?  ', a == b)
     c = a + b
     print('Pattern c = a + b:',c.PATTERN)
+    print('\n>>> c.process(text)')
     c.process(text)
     j = k + a
     print('Table j (superset of table k):')
