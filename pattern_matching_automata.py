@@ -159,8 +159,9 @@ if __name__ == '__main__':
 
     # Basic usage
     k = pattern_matching_fsa('TAT')
-    print('Pattern:',k.PATTERN)
-    print('Alphabet: ',k.alphabet)
+    print('Pattern:',k.pattern)
+    print('Alphabet:',k.alphabet)
+    print('Dictionary:',k.dict)
     print('Table:')
     print(k)
     text = 'CCCGGCTGCTACAGTAATTATATAAGTATTATTATGCC'
@@ -170,15 +171,21 @@ if __name__ == '__main__':
     # Some more advanced examples
     a = pattern_matching_fsa('TAT')
     b = pattern_matching_fsa('ATA')
-    print('Pattern a:',a.PATTERN)
-    print('Pattern b:',b.PATTERN)
+    print('Pattern a:',a.pattern)
+    print('Pattern b:',b.pattern)
     print('k == a ?  ', k == a)
     print('a == b ?  ', a == b)
     c = a + b
-    print('Pattern c = a + b:',c.PATTERN)
+    print('Pattern c = a + b:',c.pattern)
     print('\n>>> c.process(text)')
     c.process(text)
     j = k + a
     print('Table j (superset of table k):')
     print(j)
     j.process(text, verbose = True)
+    print('Pattern j:',j.pattern)
+    print("\n>>> j.pattern = 'GT'")
+    j.pattern = 'GT'
+    print('Pattern j:',j.pattern)
+    print('Table j:')
+    print(j)
