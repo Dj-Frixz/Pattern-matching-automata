@@ -9,13 +9,8 @@ class pattern_matching_fsa:
     ### SPECIAL METHODS
 
     def __init__(self, pattern:str, __dict = None) -> None:
-        self.PATTERN = pattern
-        self.M = len(pattern) # the length of the pattern
-        # this dictionary will be the structure of the automation
-        self.dict = __dict if __dict is not None else {0 : {-1 : 0}}
-        self.__generate_dict()
-        # private attribute, useful only for formatting output internally
-        self.__digits = len(str(self.M))
+        # moved initialization to another function
+        self.__init_fsa(pattern, __dict)
     
     def __str__(self) -> str:
         '''A method to represent the FSA in the table format.'''
@@ -25,27 +20,37 @@ class pattern_matching_fsa:
         for ch in SIGMA:
             table += space_btw + ch
         table += '\n    ' + space_btw + ('-'*(self.__digits + 1)) * (len(SIGMA)-1) + '-'*self.__digits
-        for state in self.dict:
+        for state in self.__dict:
             table += '\n {:{space}d} :'.format(state, space=self.__digits)
             for ch in SIGMA:
-                if ch in self.dict[state]:
-                    table += ' {:{space}d}'.format(self.dict[state][ch], space=self.__digits)
+                if ch in self.__dict[state]:
+                    table += ' {:{space}d}'.format(self.__dict[state][ch], space=self.__digits)
                 else:
-                    table += space_btw + '0' # self.dict[state][-1] should be 0 for any state
+                    table += space_btw + '0' # self.__dict[state][-1] should be 0 for any state
         table += '\n'
         return table
     
     def __eq__(self, __value: object) -> bool:
         '''Two istances are comparated by their patterns, as two identical patterns should generate the same FSA'''
-        return self.PATTERN == __value.PATTERN
+        return self.__PATTERN == __value.PATTERN
     
     def __add__(self, __value:str|object) -> object:
         '''Using the <+> operator produces a new FSA without rebuilding the entire FSA structure from scratch'''
         if type(__value) == str:
-            return pattern_matching_fsa(self.PATTERN + __value, self.dict)
-        return pattern_matching_fsa(self.PATTERN + __value.PATTERN, self.dict)
+            return pattern_matching_fsa(self.__PATTERN + __value, self.__dict)
+        return pattern_matching_fsa(self.__PATTERN + __value.PATTERN, self.__dict)
 
     ### PRIVATE METHODS
+
+    def __init_fsa(self, pattern, __dict):
+        '''Reusable method to initialize and reinitialize self.'''
+        self.__PATTERN = pattern
+        self.M = len(pattern) # the length of the pattern
+        # this dictionary will be the structure of the automation
+        self.__dict = __dict if __dict is not None else {0 : {-1 : 0}}
+        self.__generate_dict()
+        # private attribute, useful only for formatting output internally
+        self.__digits = len(str(self.M))
 
     def __generate_dict(self):
         '''The table for the machine is generated in a dict, following the scheme:
@@ -54,42 +59,42 @@ class pattern_matching_fsa:
         If the input (str type) is not found in the dict,
         the input searched defaults to -1 (int type, not str).'''
 
-        start = max(self.dict) + 1
+        start = max(self.__dict) + 1
 
         if self.M < start:
             return # the dictionary is already completed
         
-        self.dict[start-1][self.PATTERN[start-1]] = start
+        self.__dict[start-1][self.__PATTERN[start-1]] = start
 
         for i in range(start, self.M+1):
-            self.dict[i] = {}
-            self.__find_pointers(self.PATTERN[0:i],i)
+            self.__dict[i] = {}
+            self.__find_pointers(self.__PATTERN[0:i],i)
         
 
-    def __find_pointers(self, substr:str, state:int) -> None:
+    def __find_pointers(self, substr, state):
         '''This method finds what every state should point to based on the possible inputs.'''
         k = len(substr)
         # if the first char of the pattern is found defaults to state 0
         # (this behaviour can be overwritten in the loop below)
-        self.dict[state][substr[0]] = 1
+        self.__dict[state][substr[0]] = 1
         for i in range(1,k):
             if substr[0:i] == substr[k-i:k]:
-                self.dict[state][substr[i]] = i+1
+                self.__dict[state][substr[i]] = i+1
         # if the correct char is found, go to the next state (new_state = state+1)
         # this overwrites any behaviour set in the loop,
         # as the priority should be to look for a match
         if state!=self.M: # if it is self.M it's already in the final state
-            self.dict[state][self.PATTERN[state]] = state+1
+            self.__dict[state][self.__PATTERN[state]] = state+1
         # -1 (not '-1') is a special jolly input for the cases not considered
         # It represents the "default" case, where new_state is always 0
-        self.dict[state][-1] = 0
+        self.__dict[state][-1] = 0
     
     ### NON-PUBLIC METHODS
 
-    def _f(self, state:int, input_) -> int:
-        if input_ not in self.dict[state]:
+    def _f(self, state:int, input_:str) -> int:
+        if input_ not in self.__dict[state]:
             input_ = -1
-        return self.dict[state][input_]
+        return self.__dict[state][input_]
     
     ### USER METHODS
 
@@ -127,10 +132,24 @@ class pattern_matching_fsa:
         
         print('\n {:d} matches have been found in text.\n'.format(count))
         return count
+    
+    ## getter and setter methods
 
     @property
     def alphabet(self):
-        return set(self.PATTERN)
+        return set(self.__PATTERN)
+    
+    @property
+    def pattern(self):
+        return self.__PATTERN
+    
+    @pattern.setter
+    def pattern(self, new_pattern):
+        self.__init_fsa(new_pattern, None)
+    
+    @property
+    def dict(self):
+        return self.__dict
 
 
 if __name__ == '__main__':
