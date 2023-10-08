@@ -32,13 +32,13 @@ class pattern_matching_fsa:
     
     def __eq__(self, __value: object) -> bool:
         '''Two istances are comparated by their patterns, as two identical patterns should generate the same FSA'''
-        return self.__PATTERN == __value.PATTERN
+        return self.__PATTERN == __value.__PATTERN
     
     def __add__(self, __value:str|object) -> object:
         '''Using the <+> operator produces a new FSA without rebuilding the entire FSA structure from scratch'''
         if type(__value) == str:
             return pattern_matching_fsa(self.__PATTERN + __value, self.__dict)
-        return pattern_matching_fsa(self.__PATTERN + __value.PATTERN, self.__dict)
+        return pattern_matching_fsa(self.__PATTERN + __value.__PATTERN, self.__dict)
 
     ### PRIVATE METHODS
 
